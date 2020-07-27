@@ -5,7 +5,7 @@
     2.bindService()
 
 
-==>there are below type of service
+==> there are below type of service
    Service
    1 Started Service                          
             1.1 ForeGround Service     
