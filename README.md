@@ -4,7 +4,6 @@
     1.startService()
     2.bindService()
 
-
 ==> there are below type of service
    Service
    1 Started Service                          
