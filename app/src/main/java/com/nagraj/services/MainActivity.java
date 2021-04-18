@@ -1,6 +1,7 @@
 package com.nagraj.services;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import android.content.BroadcastReceiver;
@@ -20,7 +21,7 @@ import static com.nagraj.services.ForegroundService.MSG_KEY_FOREGROUND_SERVICE;
 public class MainActivity extends AppCompatActivity {
     public final static String MSG_KEY_MAIN_ACTIVITY = "msg_key_main_activity";
     Intent intentBackgroundService, intentForegroundService, intentBoundedService;
-    Switch swBackgroundService, swForegroundService, swBoundedService;
+    SwitchCompat swBackgroundService, swForegroundService, swBoundedService;
     EditText etMessage;
 
     @Override

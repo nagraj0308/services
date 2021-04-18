@@ -12,7 +12,7 @@
         android:gravity="center"
         android:layout_height="wrap_content"
         android:hint="Enter Text" />
-    <Switch
+    <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/sw_background_service"
         android:layout_width="wrap_content"
         android:layout_marginTop="20dp"
@@ -20,7 +20,7 @@
         android:layout_height="wrap_content"
         android:text="Background Service" />
 
-    <Switch
+    <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/sw_foreground_service"
         android:layout_width="wrap_content"
         android:layout_marginTop="20dp"
@@ -28,7 +28,7 @@
         android:layout_height="wrap_content"
         android:text="Foreground Service" />
 
-    <Switch
+    <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/sw_bounded_service"
         android:layout_width="wrap_content"
         android:layout_marginTop="20dp"
