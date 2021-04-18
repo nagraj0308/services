@@ -12,25 +12,38 @@ import android.graphics.Color;
 import android.media.AudioAttributes;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
+
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
+import static com.nagraj.services.MainActivity.MSG_KEY_MAIN_ACTIVITY;
 
 public class ForegroundService extends Service {
     private static final int ONGOING_NOTIFICATION = 1;
-    public static final String CHANNEL_ID= "foreground_service_channel_id";
+    public static final String CHANNEL_ID = "foreground_service_channel_id";
+    public final static String MSG_KEY_FOREGROUND_SERVICE = "msg_key_foreground_service";
+    final Handler handler = new Handler();
+    Context context;
+    private long remainingTime;
+
 
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.e("TAG","onCreate");
+        Log.e("TAG", "onCreate");
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.e("TAG","onStartCommand");
+        remainingTime=System.currentTimeMillis()+10*1000;
+        context=this;
+        Log.e("TAG", "onStartCommand");
         createNotification();
+        startLooper();
         Intent notificationIntent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this,
                 0, notificationIntent, 0);
@@ -39,32 +52,36 @@ public class ForegroundService extends Service {
                 .setContentIntent(pendingIntent)
                 .setContentText(intent.getStringExtra("MSG"))
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
-                .setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE+ "://" +getApplicationContext().getPackageName()+"/"+R.raw.vibrate))
+                .setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + getApplicationContext().getPackageName() + "/" + R.raw.vibrate))
                 .setVibrate(new long[]{0, 500, 1000})
                 .setWhen(System.currentTimeMillis())
-                .setDefaults(Notification.DEFAULT_LIGHTS )
+                .setDefaults(Notification.DEFAULT_LIGHTS)
                 .build();
         startForeground(ONGOING_NOTIFICATION, notification);
         return START_STICKY;
+
 
     }
 
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        Log.e("TAG","onBind");
+        Log.e("TAG", "onBind");
+
+
         return null;
     }
 
     @Override
     public void onDestroy() {
-        Log.e("TAG","onDestroy");
+        Log.e("TAG", "onDestroy");
+        stopLooper();
         super.onDestroy();
     }
 
-    public void createNotification(){
-        Uri soundUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE+ "://"+ getPackageName() + "/" + R.raw.vibrate);
-        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.O){
+    public void createNotification() {
+        Uri soundUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + getPackageName() + "/" + R.raw.vibrate);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel notificationChannel = new NotificationChannel(CHANNEL_ID,
                     "Foreground Service", NotificationManager.IMPORTANCE_DEFAULT);
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
@@ -77,8 +94,29 @@ public class ForegroundService extends Service {
                     .setUsage(AudioAttributes.USAGE_NOTIFICATION)
                     .build();
             notificationChannel.setSound(soundUri, audioAttributes);
-            notificationManager.createNotificationChannel( notificationChannel );
+            notificationManager.createNotificationChannel(notificationChannel);
         }
     }
+
+    void startLooper() {
+        r.run();
+        Log.e("TAG", "startLooper");
+    }
+
+    void stopLooper() {
+        handler.removeCallbacks(r);
+        Log.e("TAG", "stopLooper");
+    }
+
+    final Runnable r = new Runnable() {
+        @Override
+        public void run() {
+            Intent intent = new Intent(MSG_KEY_FOREGROUND_SERVICE);
+            intent.putExtra(MSG_KEY_MAIN_ACTIVITY, String.valueOf((remainingTime-System.currentTimeMillis())/1000));
+            LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+            handler.postDelayed(this, 1000);
+        }
+    };
+
 
 }
